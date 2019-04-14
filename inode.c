@@ -9,7 +9,7 @@
 
 inode*
 get_inode(int inum){
-	void* in = in = (void*)(pages_get_page(0) + 64);
+	void* in = (void*)(pages_get_page(0) + 64);
 	return in + (inum * sizeof(inode));
 }
 
