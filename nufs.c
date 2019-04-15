@@ -86,7 +86,7 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
-    int rv = storage_mknod(path, 040755);
+    int rv = storage_mknod(path, 040000 + mode);
     printf("mkdir(%s, %04o) -> %d\n", path, mode, rv);
     return rv;
 }
