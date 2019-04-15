@@ -49,7 +49,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     struct stat st;
     int rv = -ENOENT;
     // TODO: actually iterate through directories
-    inode* rn = get_inode(0);
+    inode* rn = get_inode(tree_lookup(path));
     dirent* root = (dirent*)pages_get_page(rn->ptrs[0]); 
 
     for (int i = 0; i < 64; i++) {
