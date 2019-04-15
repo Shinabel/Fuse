@@ -103,26 +103,43 @@ int storage_link(const char *from, const char *to){
 int
 storage_unlink(const char* path){
 	char* name = (char*)malloc(strlen(path));
-	char* temp_n = name;
-	strcpy(name,path);
-	name = strrchr(name,'/');
-	name += 1;
-	int rv = 0;
+    char* parent = (char*)malloc(strlen(path));
+	char* temp = name;
 
+    strcpy(name, path);
+    strcpy(parent, path);
+    name = strrchr(name, '/'); // get the last file name after '/'
+    name++;
+
+    // minus one for '/'
+    // remove that name to get parent directory
+    int loc = strlen(path) - strlen(name);
+    parent[loc] = 0;
+
+    int p_in = tree_lookup(parent);
 	int inum = tree_lookup(path);
-	if (inum < 0){
-		return inum;
+
+	if (inum < 0 || p_in < 0){
+        printf("UNLINK CAUSED A PROBLEM\n");
+        int n = inum < 0 ? inum : p_in;
+		return n;
 	}
-	inode* node = get_inode(inum);
 
-	free_page(node->ptrs[0]);
-    
-	void* bm = get_inode_bitmap();
-	bitmap_put(bm,inum, 0);
+    int rv = 0;
+	inode* in = get_inode(inum);
+    inode* pnode = get_inode(p_in);
 
-	rv = directory_delete(get_inode(0),name);
-	free(temp_n);
-	return rv;
+    if (in->refs > 1) {
+        in->refs--;
+    } else {
+        free_page(in->ptrs[0]);
+        void* bm = get_inode_bitmap();
+        bitmap_put(bm,inum, 0);
+    }
+
+    rv = directory_delete(pnode, name);
+    free(temp);
+    return rv;
 }
 
 int storage_rename(const char* from, const char* to){
