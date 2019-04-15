@@ -5,8 +5,6 @@
 
 #include "util.h"
 
-
-
 inode*
 get_inode(int inum){
 	void* in = (void*)(pages_get_page(0) + 64);
