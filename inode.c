@@ -52,4 +52,10 @@ void print_inode(inode* node) {
 	tmp = localtime(&node->ctime);
 	strftime(ts, 20, "%x - %I:%M%p", tmp);
 	printf("Creation Time: %s\n", ts);
+	tmp = localtime(&node->atime);
+	strftime(ts, 20, "%x - %I:%M%p", tmp);
+	printf("Acess Time: %s\n", ts);
+	tmp = localtime(&node->mtime);
+	strftime(ts, 20, "%x - %I:%M%p", tmp);
+	printf("Modification Time: %s\n", ts);
 }

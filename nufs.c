@@ -62,6 +62,10 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
             st.st_uid  = getuid();
             st.st_size = node->size;
             st.st_ino = root[i].inum;
+            st.st_atime = node->atime;
+            st.st_mtime = node->mtime;
+            st.st_ctime = node->ctime;
+
             printf("HI -> (%d)\n", root[i].inum);
             filler(buf, root[i].name, &st, 0);
             rv = 0;

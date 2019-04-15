@@ -31,6 +31,9 @@ storage_stat(const char* path, struct stat* st){
 	st->st_mode = in->mode;
 	st->st_size = in->size;
 	st->st_uid = getuid();
+    st->st_atime = in->atime;
+    st->st_mtime = in->mtime;
+    st->st_ctime = in->ctime;
 	st->st_ino = n;
 	return 0;
 }
