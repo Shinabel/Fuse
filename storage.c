@@ -106,7 +106,7 @@ int storage_link(const char *from, const char *to){
     int p_in = tree_lookup(parent);
 
 	if (inum < 0 || p_in < 0){
-        printf("UNLINK CAUSED A PROBLEM\n");
+        printf("LINK CAUSED A PROBLEM\n");
         int n = inum < 0 ? inum : p_in;
 		return n;
 	}
