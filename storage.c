@@ -3,6 +3,8 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <fuse.h>
+#include <time.h>
+#include <errno.h>
 
 #include "storage.h"
 #include "bitmap.h"
@@ -29,6 +31,9 @@ storage_stat(const char* path, struct stat* st){
 	st->st_mode = in->mode;
 	st->st_size = in->size;
 	st->st_uid = getuid();
+    st->st_atime = in->atime;
+    st->st_mtime = in->mtime;
+    st->st_ctime = in->ctime;
 	st->st_ino = n;
 	return 0;
 }
@@ -48,6 +53,11 @@ int storage_read(const char* path, char* buf, size_t size, off_t offset) {
     char* data = (char*)pages_get_page(pnum);
 
     strncpy(buf, data, size);
+    
+    // update the access time when read
+    time_t now = time(0);
+    in->atime = now;
+
     return size;
 }
 
@@ -64,6 +74,13 @@ int storage_write(const char* path, const char* buf, size_t size, off_t offset){
     char* data = (char*)pages_get_page(pnum);
 
     strncpy(data, buf , size);
+
+    // update the time when written
+    time_t now = time(0);
+    in->atime = now;
+    in->ctime = now;
+    in->mtime = now;
+
 
     return size;
 }
@@ -137,9 +154,33 @@ int storage_mknod(const char* path, int mode){
     in->refs = 1;
     in->ptrs[0] = alloc_page();
 
+    // update the time when written
+    time_t now = time(0);
+    in->atime = now;
+    in->ctime = now;
+    in->mtime = now;
+
+
     int rv = directory_put(rn, name, inum);
 
     free(tn);
     return rv;
 }
 
+int storage_set_time(const char* path, const struct timespec ts[2]){
+    int n = tree_lookup(path);
+    inode* in = get_inode(n);
+    in->atime = ts[0].tv_sec;
+    in->mtime = ts[1].tv_sec;
+    return 0;
+}
+
+int storage_chmod(const char* path, mode_t mode) {
+    int n = tree_lookup(path);
+    if (n < 0) {
+        return -ENOENT;
+    }
+    inode* in = get_inode(n);
+    in->mode = mode;
+    return 0;
+}
