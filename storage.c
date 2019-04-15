@@ -136,24 +136,30 @@ int storage_rename(const char* from, const char* to){
 
 int storage_mknod(const char* path, int mode){
     char* name = (char*)malloc(strlen(path));
-    char* tn = name;
+    char* parent = (char*)malloc(strlen(path));
+
     strcpy(name, path);
-    name = strrchr(name, '/');
-    name++;
+    name = strrchr(name, '/'); // get the last file name after '/'
+    
+    // minus one for '/'
+    // remove that name to get parent directory
+    int loc = strlen(path) - strlen(name) - 1;
+    parent[loc] = 0;
 	
+    int pn = tree_lookup(parent);
+    inode* p_in = get_inode(pn);
+
     int inum = alloc_inode();
     if (inum == -1) {
         printf("ERROR: NO free inode!\n");
         return -1;
     }
 
-    inode* rn = get_inode(0); //TODO: find parent node
     inode* in = get_inode(inum);
     in->mode = mode;
     in->size = 0;
     in->refs = 1;
     in->ptrs[0] = alloc_page();
-
     // update the time when written
     time_t now = time(0);
     in->atime = now;
@@ -161,9 +167,11 @@ int storage_mknod(const char* path, int mode){
     in->mtime = now;
 
 
-    int rv = directory_put(rn, name, inum);
+    int rv = directory_put(p_in, name, inum);
 
-    free(tn);
+
+    free(name);
+    free(parent);
     return rv;
 }
 
