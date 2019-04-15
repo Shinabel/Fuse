@@ -5,8 +5,6 @@
 
 #include "util.h"
 
-
-
 inode*
 get_inode(int inum){
 	void* in = (void*)(pages_get_page(0) + 64);
@@ -43,4 +41,15 @@ int inode_get_pnum(inode* node, int fpn) {
     if (fpn < 2) return node->ptrs[fpn];
     int* plist = pages_get_page(node->iptr);
     return plist[fpn];
+}
+
+void print_inode(inode* node) {
+	printf("LOCATION: %p\n", node);
+	printf("Ref Count: %d\n", node->refs);
+	printf("MODE: %d\n", node->mode);
+	struct tm* tmp;
+	char ts[20];
+	tmp = localtime(&node->ctime);
+	strftime(ts, 20, "%x - %I:%M%p", tmp);
+	printf("Creation Time: %s\n", ts);
 }

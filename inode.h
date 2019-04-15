@@ -13,6 +13,10 @@ typedef struct inode {
     int size; // bytes
     int ptrs[2]; // direct pointers
     int iptr; // single indirect pointer
+    time_t ctime; // creation time
+    time_t atime; // access time
+    time_t mtime; // modification time
+
 } inode;
 
 void print_inode(inode* node);
