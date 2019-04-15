@@ -4,6 +4,7 @@
 #include <assert.h>
 #include <fuse.h>
 #include <time.h>
+#include <errno.h>
 
 #include "storage.h"
 #include "bitmap.h"
@@ -168,5 +169,15 @@ int storage_set_time(const char* path, const struct timespec ts[2]){
     inode* in = get_inode(n);
     in->atime = ts[0].tv_sec;
     in->mtime = ts[1].tv_sec;
+    return 0;
+}
+
+int storage_chmod(const char* path, mode_t mode) {
+    int n = tree_lookup(path);
+    if (n < 0) {
+        return -ENOENT;
+    }
+    inode* in = get_inode(n);
+    in->mode = mode;
     return 0;
 }
