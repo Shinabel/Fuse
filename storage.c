@@ -86,16 +86,39 @@ int storage_write(const char* path, const char* buf, size_t size, off_t offset){
 }
 
 int storage_link(const char *from, const char *to){
-    // TODO: for ch03 with directory
-    int n = tree_lookup(from); // always returns 0 since root for now
-    inode* in = get_inode(n);
+
+	int inum = tree_lookup(from);
 
     char* name = (char*)malloc(strlen(to));
-    strcpy(name,to);
-    in->refs++;
+    char* parent = (char*)malloc(strlen(to));
+	char* temp = name;
 
-    directory_put(in, name, n);
-    free(name);
+    strcpy(name, to);
+    strcpy(parent, to);
+    name = strrchr(name, '/'); // get the last file name after '/'
+    name++;
+
+    // minus one for '/'
+    // remove that name to get parent directory
+    int loc = strlen(from) - strlen(name);
+    parent[loc] = 0;
+
+    int p_in = tree_lookup(parent);
+
+	if (inum < 0 || p_in < 0){
+        printf("UNLINK CAUSED A PROBLEM\n");
+        int n = inum < 0 ? inum : p_in;
+		return n;
+	}
+    // from node
+	inode* in = get_inode(inum);
+    in->refs++;
+    // parent to node
+    inode* pnode = get_inode(p_in);
+
+    directory_put(pnode, name, inum);
+    free(temp);
+    free(parent);
     return 0;
 }
 
@@ -143,7 +166,6 @@ storage_unlink(const char* path){
 }
 
 int storage_rename(const char* from, const char* to){
-    // TODO: for ch03 with directory
     int rv = storage_link(from,to);
     if (rv < 0){
         return rv;
