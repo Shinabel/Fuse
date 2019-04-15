@@ -49,7 +49,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
     struct stat st;
     int rv = -ENOENT;
     // TODO: actually iterate through directories
-    inode* rn = get_inode(0);
+    inode* rn = get_inode(tree_lookup(path));
     dirent* root = (dirent*)pages_get_page(rn->ptrs[0]); 
 
     for (int i = 0; i < 64; i++) {
@@ -65,8 +65,6 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
             st.st_atime = node->atime;
             st.st_mtime = node->mtime;
             st.st_ctime = node->ctime;
-
-            printf("HI -> (%d)\n", root[i].inum);
             filler(buf, root[i].name, &st, 0);
             rv = 0;
         }
@@ -80,8 +78,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
-    int rv = -1;
-    rv = storage_mknod(path, mode);
+    int rv = storage_mknod(path, mode);
     printf("mknod(%s, %04o) -> %d\n", path, mode, rv);
     return rv;
 }
@@ -92,8 +89,8 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
-    int rv = -1;
-    printf("mkdir(%s) -> %d\n", path, rv);
+    int rv = storage_mknod(path, 040000 + mode);
+    printf("mkdir(%s, %04o) -> %d\n", path, mode, rv);
     return rv;
 }
 
