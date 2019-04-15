@@ -62,7 +62,6 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
             st.st_uid  = getuid();
             st.st_size = node->size;
             st.st_ino = root[i].inum;
-            printf("HI -> (%d)\n", root[i].inum);
             filler(buf, root[i].name, &st, 0);
             rv = 0;
         }
@@ -76,8 +75,7 @@ nufs_readdir(const char *path, void *buf, fuse_fill_dir_t filler,
 int
 nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 {
-    int rv = -1;
-    rv = storage_mknod(path, mode);
+    int rv = storage_mknod(path, mode);
     printf("mknod(%s, %04o) -> %d\n", path, mode, rv);
     return rv;
 }
@@ -88,8 +86,8 @@ nufs_mknod(const char *path, mode_t mode, dev_t rdev)
 int
 nufs_mkdir(const char *path, mode_t mode)
 {
-    int rv = -1;
-    printf("mkdir(%s) -> %d\n", path, rv);
+    int rv = storage_mknod(path, 040755);
+    printf("mkdir(%s, %04o) -> %d\n", path, mode, rv);
     return rv;
 }
 
