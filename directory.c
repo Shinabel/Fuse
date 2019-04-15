@@ -33,6 +33,11 @@ int tree_lookup(const char* path){
 	slist* parts = s_split(path, '/');
 	int dn = 0;
 
+	if (parts == NULL || parts->next == NULL) {
+		// root directory
+		return 0;
+	}
+
 	while(parts != NULL){
 		inode* dir = get_inode(dn);
 		dn = directory_lookup(dir, parts->data);

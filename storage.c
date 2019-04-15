@@ -137,13 +137,16 @@ int storage_rename(const char* from, const char* to){
 int storage_mknod(const char* path, int mode){
     char* name = (char*)malloc(strlen(path));
     char* parent = (char*)malloc(strlen(path));
+    char* temp = name;
 
     strcpy(name, path);
+    strcpy(parent, path);
     name = strrchr(name, '/'); // get the last file name after '/'
-    
+    name++;
+
     // minus one for '/'
     // remove that name to get parent directory
-    int loc = strlen(path) - strlen(name) - 1;
+    int loc = strlen(path) - strlen(name);
     parent[loc] = 0;
 	
     int pn = tree_lookup(parent);
@@ -169,8 +172,7 @@ int storage_mknod(const char* path, int mode){
 
     int rv = directory_put(p_in, name, inum);
 
-
-    free(name);
+    free(temp);
     free(parent);
     return rv;
 }
