@@ -29,6 +29,7 @@ storage_stat(const char* path, struct stat* st){
 	}
 	inode* in = get_inode(n);
 	st->st_mode = in->mode;
+    st->st_nlink = in->refs;
 	st->st_size = in->size;
 	st->st_uid = getuid();
     st->st_atime = in->atime;
