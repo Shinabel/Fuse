@@ -28,9 +28,14 @@ int grow_inode(inode* node, int size){
 	int new_size = bytes_to_pages(size);
 	int start = bytes_to_pages(node->size);
 	for (int ii = start; ii <= (new_size + start); ii++){
-		if (node->iptr == 0){
-			node->iptr = alloc_page();
-		}
+		if (ii < 2) node->ptrs[ii] = alloc_page();
+		else{
+			if (node->iptr == 0){
+				node->iptr = alloc_page();
+			}
+			int* iptrs = pages_get_page(node->iptr);
+			iptrs[ii - 2] = alloc_page();
+		} 
 	}
 	node->size += size;
 	return 0;
