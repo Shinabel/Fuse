@@ -168,6 +168,7 @@ storage_unlink(const char* path){
 
     rv = directory_delete(pnode, name);
     free(temp);
+    free(parent);
     return rv;
 }
 
