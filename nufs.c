@@ -135,6 +135,7 @@ int
 nufs_chmod(const char *path, mode_t mode)
 {
     int rv = -1;
+    rv = storage_chmod(path, mode);
     printf("chmod(%s, %04o) -> %d\n", path, mode, rv);
     return rv;
 }
@@ -143,6 +144,7 @@ int
 nufs_truncate(const char *path, off_t size)
 {
     int rv = -1;
+    rv = storage_truncate(path, size);
     printf("truncate(%s, %ld bytes) -> %d\n", path, size, rv);
     return rv;
 }
@@ -204,6 +206,7 @@ int
 nufs_readlink(const char* path, char* buf, size_t size) {
     int rv = -ENOENT;
     rv = storage_read(path, buf, size , 0);
+    printf("readlink(%s) -> (%d)\n", path, rv);
     return rv;
 }
 
@@ -216,6 +219,7 @@ nufs_symlink(const char* to, const char* from){
         return rv;
     }
     rv = storage_write(from, to, strlen(to), 0);
+    printf("symlink(%s, %s) -> (%d)\n", from, to, rv);
     return rv;
 }
 
