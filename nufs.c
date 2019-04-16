@@ -223,6 +223,7 @@ nufs_init_ops(struct fuse_operations* ops)
     ops->ioctl    = nufs_ioctl;
 };
 
+
 struct fuse_operations nufs_ops;
 
 int

@@ -27,12 +27,16 @@ alloc_inode(){
 int grow_inode(inode* node, int size){
 	int new_size = bytes_to_pages(size);
 	int start = bytes_to_pages(node->size);
-	for(int ii = start; ii <= (new_size + start); ii++){
-		if(node->iptr == 0){
+	for (int ii = start; ii <= (new_size + start); ii++){
+		if (node->iptr == 0){
 			node->iptr = alloc_page();
 		}
 	}
 	node->size += size;
+	return 0;
+}
+
+int shrink_inode(inode* node, int size) {
 	return 0;
 }
 

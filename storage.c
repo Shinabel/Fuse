@@ -39,20 +39,26 @@ storage_stat(const char* path, struct stat* st){
 }
 
 int storage_read(const char* path, char* buf, size_t size, off_t offset) {
-    // TODO: for ch03 with directory
-    
-    // make sure file size < 4k
-    if (offset + size > 4096) return -1;
-
-    int n = tree_lookup(path); // always returns 0 since root for now
+    int n = tree_lookup(path);
     inode* in = get_inode(n);
 
-    // TODO: size > 4k
-    // need to account for bigger case
-    int pnum = inode_get_pnum(in, 0);
-    char* data = (char*)pages_get_page(pnum);
+    int index = 0;
+    int oindex = offset;
+    int leftover = size;
 
-    strncpy(buf, data, size);
+    while (leftover > 0) {
+        int pn = inode_get_pnum(in, oindex);
+        char* data = (char*)pages_get_page(pn);
+
+        int off_amount = oindex % 4096;
+
+        data += off_amount;
+        int amount = min(4096 - off_amount, leftover);
+        strncpy(buf + index, data, amount);
+        index += amount;
+        oindex += amount;
+        leftover -= amount;
+    }
     
     // update the access time when read
     time_t now = time(0);
@@ -62,8 +68,7 @@ int storage_read(const char* path, char* buf, size_t size, off_t offset) {
 }
 
 int storage_write(const char* path, const char* buf, size_t size, off_t offset){
-    // TODO: for ch03 with directory
-    int n = tree_lookup(path); // always returns 0 since root for now
+    int n = tree_lookup(path);
     inode* in = get_inode(n);
     
     int grow = in->size + size - offset ;
@@ -231,5 +236,20 @@ int storage_chmod(const char* path, mode_t mode) {
     }
     inode* in = get_inode(n);
     in->mode = mode;
+    return 0;
+}
+
+int storage_truncate(const char *path, off_t size) {
+    int n = tree_lookup(path);
+    if (n < 0) {
+        printf("TRUNCATION ERROR\n");
+        return -ENOENT;
+    }
+    inode* in = get_inode(n);
+    if (in->size > size) {
+        // shrink_inode(in, size);
+    } else {
+        grow_inode(in, size);
+    }
     return 0;
 }
