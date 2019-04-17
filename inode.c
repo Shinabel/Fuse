@@ -25,19 +25,26 @@ alloc_inode(){
 }
 
 int grow_inode(inode* node, int size){
+	printf("GROWING INODE FROM %d to %d\n", node->size, size);
 	int new_size = bytes_to_pages(size);
 	int start = bytes_to_pages(node->size);
-	for (int ii = start; ii <= (new_size + start); ii++){
-		if (ii < 2) node->ptrs[ii] = alloc_page();
-		else{
-			if (node->iptr == 0){
+	printf("GROWING INODE START FROM PAGE %d to PAGE %d\n", start, new_size);
+	for (int ii = start; ii < new_size; ii++){
+		if (ii < 2) 
+		{
+			node->ptrs[ii] = alloc_page();
+		}
+		else
+		{
+			if (node->iptr == 0)
+			{
 				node->iptr = alloc_page();
 			}
 			int* iptrs = pages_get_page(node->iptr);
 			iptrs[ii - 2] = alloc_page();
 		} 
 	}
-	node->size += size;
+	node->size = size;
 	return 0;
 }
 
@@ -47,9 +54,11 @@ int shrink_inode(inode* node, int size) {
 
 // get the parent node number
 int inode_get_pnum(inode* node, int fpn) {
+		printf("FPN = %d\n", fpn);
+		fflush(stdout);
     if (fpn < 2) return node->ptrs[fpn];
     int* plist = pages_get_page(node->iptr);
-    return plist[fpn];
+    return plist[fpn - 2];
 }
 
 void print_inode(inode* node) {
