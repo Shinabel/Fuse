@@ -101,7 +101,6 @@ int storage_write(const char* path, const char* buf, size_t size, off_t offset){
     in->atime = now;
     in->mtime = now;
 
-
     return size;
 }
 
@@ -264,7 +263,7 @@ int storage_truncate(const char *path, off_t size) {
     }
     inode* in = get_inode(n);
     if (in->size > size) {
-        // shrink_inode(in, size);
+        shrink_inode(in, size);
     } else {
         grow_inode(in, size);
     }
