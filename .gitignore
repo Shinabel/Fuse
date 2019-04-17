@@ -1,1 +1,9 @@
 .vscode/
+
+*.o
+
+nufs
+
+data.nufs
+
+test.log
